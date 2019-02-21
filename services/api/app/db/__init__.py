@@ -10,6 +10,30 @@ async def connect():
     return await asyncpg.create_pool(os.environ["DB_CONN"])
 
 
+def list_movies(db, limit=10):
+    return db.fetch(
+        f"SELECT * FROM movies LIMIT {limit}"
+    )  # TODO: Use pagination (not limit)
+
+
+def top_movies(db, limit=10):
+    return db.fetch(
+        f"""
+        SELECT movie_id AS id, movies.title, AVG(rating) AS rating
+        FROM ratings
+        INNER JOIN movies ON ratings.movie_id=movies.id
+        GROUP BY movie_id, movies.title
+        LIMIT {limit}
+        """
+    )
+
+
+def list_genres(db):
+    return db.fetch(
+        "SELECT UNNEST(genres) AS genre, COUNT(*) FROM movies GROUP BY genre"
+    )
+
+
 def insert_movies(db, movies):
     return db.executemany(
         "INSERT INTO movies(id, title, genres, year) VALUES($1, $2, $3, $4)", movies
