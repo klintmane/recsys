@@ -1,0 +1,26 @@
+version: "3"
+
+services:
+  db:
+    build: ./services/db
+    volumes:
+      - db_data:/var/lib/postgresql
+    ports:
+      - "5000:5432"
+    environment:
+      - POSTGRES_DB=main
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=secret
+  api:
+    build: ./services/api
+    tty: true
+    volumes:
+      - ./services/api:/api
+    environment:
+      - DB_CONN=postgres://admin:secret@db:5432/main?sslmode=disable
+    ports:
+      - "4000:8080"
+    depends_on:
+      - db
+volumes:
+  db_data:
