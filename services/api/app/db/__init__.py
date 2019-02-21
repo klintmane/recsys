@@ -3,7 +3,7 @@ import os
 from datetime import datetime
 
 
-DBError = asyncpg.PostgresError
+Error = asyncpg.PostgresError
 
 
 async def connect():

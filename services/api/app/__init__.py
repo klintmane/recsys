@@ -1,13 +1,13 @@
 import asyncio
 from aiohttp import web
 from app.routes import routes
-from app.db import connect
+import app.db as db
 
 
 async def init():
     app = web.Application()
     app.add_routes(routes)
-    app["db"] = await connect()
+    app["db_conn"] = await db.connect()
 
     return app
 
