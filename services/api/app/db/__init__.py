@@ -10,21 +10,24 @@ async def connect():
     return await asyncpg.create_pool(os.environ["DB_CONN"])
 
 
-def list_movies(db, limit=10):
+def list_movies(db, page=0, page_size=100):
     return db.fetch(
-        f"SELECT * FROM movies LIMIT {limit}"
-    )  # TODO: Use pagination (not limit)
+        "SELECT * FROM movies ORDER BY year DESC OFFSET $1 LIMIT $2", page, page_size
+    )
 
 
-def top_movies(db, limit=10):
+def top_movies(db, page=0, page_size=10):
     return db.fetch(
-        f"""
+        """
         SELECT movie_id AS id, movies.title, AVG(rating) AS rating
         FROM ratings
         INNER JOIN movies ON ratings.movie_id=movies.id
         GROUP BY movie_id, movies.title
-        LIMIT {limit}
-        """
+        OFFSET $1
+        LIMIT $2
+        """,
+        page,
+        page_size,
     )
 
 
